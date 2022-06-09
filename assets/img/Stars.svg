@@ -1,0 +1,36 @@
+<svg width="1131" height="519" viewBox="0 0 1131 519" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_df_120_1286)">
+<circle cx="336.751" cy="25.7949" r="1.07226" fill="#E9D4FF"/>
+<circle cx="97.9938" cy="47.9551" r="1.07226" fill="#E9D4FF"/>
+<circle cx="1114.86" cy="364.272" r="2.14452" fill="#E9D4FF"/>
+<circle cx="369.276" cy="394.295" r="2.14452" fill="#E9D4FF"/>
+<circle cx="324.599" cy="361.056" r="1.07226" fill="#E9D4FF"/>
+<circle cx="537.621" cy="268.841" r="1.07226" fill="#E9D4FF"/>
+<circle cx="750.644" cy="96.564" r="1.07226" fill="#E9D4FF"/>
+<circle cx="955.088" cy="15.0723" r="1.07226" fill="#E9D4FF"/>
+<circle cx="836.067" cy="93.3472" r="2.85936" fill="#E9D4FF"/>
+<circle cx="793.892" cy="183.417" r="2.85936" fill="#E9D4FF"/>
+<circle cx="618.756" cy="44.0234" r="2.85936" fill="#E9D4FF"/>
+<circle cx="442.905" cy="272.772" r="2.85936" fill="#E9D4FF"/>
+<circle cx="267.054" cy="501.521" r="2.85936" fill="#E9D4FF"/>
+<circle cx="105.5" cy="458.631" r="2.85936" fill="#E9D4FF"/>
+<circle cx="16.8594" cy="326.386" r="2.85936" fill="#E9D4FF"/>
+<circle cx="252.757" cy="93.3472" r="2.85936" fill="#E9D4FF"/>
+<circle cx="482.221" cy="76.9062" r="2.14452" fill="#E9D4FF"/>
+<circle cx="682.377" cy="168.406" r="2.14452" fill="#E9D4FF"/>
+<circle cx="956.161" cy="99.7808" r="2.14452" fill="#E9D4FF"/>
+</g>
+<defs>
+<filter id="filter0_df_120_1286" x="0" y="0" width="1131" height="518.381" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="7"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.92549 0 0 0 0 0.905882 0 0 0 0 0.980392 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_120_1286"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_120_1286" result="shape"/>
+<feGaussianBlur stdDeviation="0.5" result="effect2_foregroundBlur_120_1286"/>
+</filter>
+</defs>
+</svg>
