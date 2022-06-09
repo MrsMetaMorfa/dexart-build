@@ -335,6 +335,9 @@ img, picture {
     left: 0;
     right: 0;
     height: 40vh; }
+    .top__mountain img {
+      -o-object-fit: contain;
+         object-fit: contain; }
   .top__noise {
     position: absolute;
     top: 0;
@@ -394,7 +397,7 @@ img, picture {
     top: 0;
     left: 0;
     height: 100vh;
-    width: 160vh;
+    width: 100vw;
     transform-origin: center center;
     transform: rotate(-2deg);
     -webkit-animation: rotate 400s linear infinite;
@@ -403,8 +406,8 @@ img, picture {
             animation-fill-mode: none; }
   .top__star {
     position: absolute;
-    top: 24%;
-    left: 69%;
+    top: 24vh;
+    left: calc(50vw + 31vh);
     height: 42.5vh;
     opacity: 0;
     -webkit-animation: pulse 2.7s linear 1s infinite;
