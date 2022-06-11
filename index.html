@@ -35,7 +35,7 @@
       <li><a href="#" class="btn">Join</a></li>
     </ul>
   </nav>
-  <div class="header__menu container">
+  <div class="header__info container">
     <div class="header__follow">
       <button class="btn btn-transparent" type="button" id="headerFollow"
               onclick="this.classList.toggle('active')">Follow Dexart</button>
@@ -84,6 +84,59 @@
       <a class="btn" href="#">Ru</a>
     </div>
   </div>
+  <div class="header__mobile">
+    <button class="btn header__button" type="button" onclick="document.querySelector('.header').classList.toggle('active')">
+      <img src="assets/img/mob-menu.svg" alt="Open menu" class="header__button--open">
+      <img src="assets/img/mob-close.svg" alt="Close menu" class="header__button--close">
+    </button>
+    <div class="header__menu">
+      <nav class="header__menu-nav">
+        <ul class="header__nav-list container">
+          <li><a href="#" class="btn">Home</a></li>
+          <li><a href="#" class="btn">World Backstory</a></li>
+          <li><a href="#" class="btn">Avatar Design tool</a></li>
+          <li><a href="#" class="btn">Map</a></li>
+          <li><a href="#" class="btn">Legal information</a></li>
+          <li><a href="#" class="btn">Join</a></li>
+        </ul>
+      </nav>
+      <div class="header__menu-follow">
+        <h2 class="header__title">Follow us</h2>
+        <ul class="container">
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_inst-dark.svg" alt="Instagram logo">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_twitter-dark.svg" alt="Twitter logo">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_youtube-dark.svg" alt="Youtube logo">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_telegram-dark.svg" alt="Telegram logo">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_medium-dark.svg" alt="Medium logo">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="btn" target="_blank">
+              <img src="assets/img/icon_reddit-dark.svg" alt="Reddit logo">
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </header>
 
 
@@ -101,6 +154,10 @@
            alt="">
     </picture>
     <picture class="top__mountain parallaxed">
+      <source srcset="assets/img/Mountain-small.png 1x,
+                        assets/img/Mountain-small2x.png 2x"
+              media="(max-width: 820px)"
+              type="image/png">
       <source srcset="assets/img/Mountain.webp 1x,
                         assets/img/Mountain2x.webp 2x"
               type="image/webp">
@@ -184,7 +241,8 @@
   </div>
 </section>
 
-<section class="section"></section>
+<section class="section section--1"></section>
+<section class="section section--2"></section>
 
 
   </main>
