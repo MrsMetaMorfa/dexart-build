@@ -144,7 +144,7 @@
   <main class="main" role="main">
     
 
-<section class="section section--top">
+<section class="section section--top parallax">
   <div class="section__bg top">
     <picture class="top__bg">
       <source srcset="assets/img/bg.webp 1x,
@@ -252,7 +252,7 @@
   </div>
 </section>
 
-<section class="section section--magical">
+<section class="section section--magical parallax">
   <div class="section__bg magical">
     <div class="magical__stars bg__stars">
       <svg xmlns="http://www.w3.org/2000/svg" width="1471" height="670" viewBox="0 0 1471 670" fill="none">
@@ -304,11 +304,11 @@
            srcset="assets/img/Noise2x.png 2x"
            alt="">
     </picture>
-    <div class="magical__stone magical__stone--big">
-      <img src="assets/img/stone-1.svg" alt="">
-    </div>
-    <div class="magical__stone magical__stone--small">
+    <div class="magical__stone magical__stone--big parallaxed">
       <img src="assets/img/stone-2.svg" alt="">
+    </div>
+    <div class="magical__stone magical__stone--small parallaxed">
+      <img src="assets/img/stone-1.svg" alt="">
     </div>
   </div>
   <div class="section__content container">
@@ -338,7 +338,8 @@
 
 <section class="section section--video">
   <div class="section__bg video">
-    <a class="video__link" href="#">
+    <iframe id="player" class="video__frame" data-src="http://www.youtube.com/embed/p9nT2bxTFQM?autoplay=1&controls=0&showinfo=0&enablejsapi=1" ></iframe>
+    <div class="video__link">
       <picture>
         <source srcset="assets/img/Video.webp 1x,
          assets/img/Video2x.webp"
@@ -348,7 +349,7 @@
              srcset="assets/img/Video2x.png 2x"
              alt="Dexart Video">
       </picture>
-    </a>
+    </div>
     <button class="btn video__button" aria-label="Play">
       <span class="video__button-inner">Play</span>
     </button>
@@ -505,7 +506,7 @@
   </div>
 </section>
 
-<section class="section section--world">
+<section class="section section--world" data-slide="0">
   <div class="section__bg world">
     <div class="world__stars bg__stars">
       <svg xmlns="http://www.w3.org/2000/svg" width="1471" height="670" viewBox="0 0 1471 670" fill="none">
@@ -601,7 +602,7 @@
   </div>
 </section>
 
-<section class="section section--backstory">
+<section class="section section--backstory parallax">
   <div class="section__bg backstory">
     <div class="backstory__stars bg__stars">
       <svg xmlns="http://www.w3.org/2000/svg" width="1471" height="670" viewBox="0 0 1471 670" fill="none">
@@ -645,16 +646,16 @@
       <img src="assets/img/bg-big-gradient-blue.svg" alt="">
     </div>
     <div class="backstory__fade"></div>
-    <picture class="backstory__stones">
+    <picture class="backstory__stones parallaxed">
       <source srcset="assets/img/stones-small.webp"
               type="image/webp">
       <img src="assets/img/stones-small.png"
            alt="">
     </picture>
-    <div class="backstory__stone backstory__stone--big">
+    <div class="backstory__stone backstory__stone--big parallaxed">
       <img src="assets/img/stone-2.svg" alt="">
     </div>
-    <div class="backstory__stone backstory__stone--small">
+    <div class="backstory__stone backstory__stone--small parallaxed">
       <img src="assets/img/stone-1.svg" alt="">
     </div>
   </div>
@@ -681,7 +682,7 @@
       <a href="#" class="btn btn-rounded">Learn More</a>
     </div>
   </div>
-  <div class="section__content place">
+  <div class="section__content place animate">
     <div class="section__card container">
       <h2 class="section__title">
         <span class="visually-hidden">Find a place for your business in DEXART</span>
@@ -815,7 +816,7 @@
       </div>
     </div>
   </div>
-  <div class="section__content community">
+  <div class="section__content community animate">
     <div class="section__card container">
       <picture class="card__bg">
         <source srcset="assets/img/community.webp"
@@ -981,7 +982,7 @@
       </div>
     </div>
   </div>
-  <div class="section__content expertise">
+  <div class="section__content expertise animate">
     <div class="expertise__lines">
       <img src="assets/img/Lines.svg" alt="">
     </div>

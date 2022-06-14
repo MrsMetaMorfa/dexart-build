@@ -1,54 +1,52 @@
-function generateURL(id) {
-  let query = '?rel=0&showinfo=0&autoplay=1';
+let tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+let firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-  return 'https://www.youtube.com/embed/' + id + query;
+let player;
+let video = document.querySelector('.video');
+let iframe = video.querySelector('.video__frame');
+let link = video.querySelector('.video__link');
+let button = video.querySelector('.video__button');
+
+function onPlayerReady() {
+  console.log(player);
 }
 
-function createIframe(id) {
-  let iframe = document.createElement('iframe');
-
-  iframe.setAttribute('allowfullscreen', '');
-  iframe.setAttribute('allow', 'autoplay');
-  iframe.setAttribute('src', generateURL(id));
-  iframe.classList.add('video__media');
-
-  return iframe;
+function pauseVideo() {
+  if (player && player.hasOwnProperty('getPlayerState')) {
+    iframe.pauseVideo();
+    button.classList.toggle('hide');
+  }
 }
-
-function parseMediaURL(media) {
-  // let regexp = /https:\/\/i\.ytimg\.com\/vi\/([a-zA-Z0-9_-]+)\/maxresdefault\.png/i;
-  let regexp = /([a-zA-Z0-9_-]+).png/i;
-  let url = media.src;
-  let match = url.match(regexp);
-
-  return match[1];
-}
-
-function setupVideo(video) {
-  let link = video.querySelector('.video__link');
-  let media = video.querySelector('.video__media');
-  let button = video.querySelector('.video__button');
-  let id = parseMediaURL(media);
-  console.log(id);
-
-  video.addEventListener('click', () => {
-    let iframe = createIframe(id);
-
-    link.remove();
-    button.remove();
-    video.appendChild(iframe);
-  });
-
-  link.removeAttribute('href');
-  video.classList.add('video--enabled');
-}
-
-function findVideos() {
-  let videos = document.querySelectorAll('.video');
-
-  for (let i = 0; i < videos.length; i++) {
-    setupVideo(videos[i]);
+function playVideo() {
+  if (player && player.hasOwnProperty('getPlayerState')) {
+    iframe.playVideo();
+    button.classList.toggle('hide');
   }
 }
 
-findVideos();
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    events: {
+      'onReady': onPlayerReady,
+    }
+  });
+
+  console.log(player, player.hasOwnProperty('getPlayerState'));
+}
+
+video.addEventListener('click', () => {
+  console.log(link.classList.contains('hide'));
+  if (!link.classList.contains('hide')) {
+    let url = iframe.getAttribute('data-src');
+    iframe.src = url;
+    playVideo();
+    link.classList.add('hide');
+  } else if (button.classList.contains('hide')) {
+    pauseVideo();
+  } else {
+    playVideo();
+  }
+  button.classList.add('hide');
+});

@@ -32,7 +32,7 @@ window.onload = function () {
   const fadeElms = document.querySelectorAll('section');
   fadeElms.forEach(el => observer.observe(el));
 
-  function parallax(e) {
+  function Parallax(e) {
     let _w = window.innerWidth/2;
     let _h = window.innerHeight/2;
     let _mouseX = e.clientX;
@@ -45,21 +45,40 @@ window.onload = function () {
     });
   }
 
-  const top = document.querySelector('.section--top');
-  top.addEventListener("mousemove", parallax);
+  const parallaxes = document.querySelectorAll('.parallax');
+  parallaxes.forEach((parallax) => {
+    parallax.addEventListener("mousemove", Parallax);
+  });
 
   const sections = document.querySelectorAll('.section');
 
   // sections.forEach((section) => {
   //   console.log(section.classList);
   // });
-  function Scroll(element, isDown) {
+  let isScrolling = false;
+
+  function Scroll(element, isDown, speed, type) {
+    isScrolling = true;
     let start = null;
     let firstPos = window.pageYOffset || document.documentElement.scrollTop;
-    let target = element.getBoundingClientRect().top;
+    let windowHeight = window.innerHeight;
+    let target = 0;
     let pos = 0;
 
-    console.log(firstPos, target, pos);
+    switch (type) {
+      case 'center':
+        target = isDown ? (windowHeight + element.offsetHeight) / 2 : element.parentElement.getBoundingClientRect().top + (windowHeight + element.offsetHeight) / 2;
+        break;
+      case 'bottom':
+        target = element.parentElement.getBoundingClientRect().bottom - windowHeight;
+        element.classList.add('animate');
+        break;
+      default:
+        target = element.getBoundingClientRect().top;
+        break;
+    }
+
+    // console.log(firstPos, target, pos);
 
     (function() {
 
@@ -77,8 +96,10 @@ window.onload = function () {
       if(!start) { start = timestamp || new Date().getTime(); } //get id of animation
 
       let elapsed = timestamp - start;
-      let progress = elapsed / 600; // animation duration 500ms
+      let progress = elapsed / +speed; // animation duration 500ms
       progress = +progress.toFixed(2);
+
+      // console.log(start, timestamp, progress, elapsed, speed, firstPos, target, pos);
 
       //ease in function from https://github.com/component/ease/blob/master/index.js
       const outQuad = function(n){
@@ -91,9 +112,9 @@ window.onload = function () {
       pos = +pos.toFixed(2);
       window.scrollTo(0, pos);
 
-      console.log(firstPos, target, pos, easeInPercentage, document.body.clientHeight - window.innerHeight);
+      // console.log(firstPos, target, pos, easeInPercentage);
 
-      if( pos < 0 ||
+      if( isNaN(pos) || pos < 0 ||
         !isDown && pos <= 0 ||
         !isDown && pos <= (firstPos + target + 1) ||
         isDown && pos >= (firstPos + target) ||
@@ -104,6 +125,7 @@ window.onload = function () {
           element.focus();
         }
         pos = 0;
+        isScrolling = false;
       } else {
         window.requestAnimationFrame(showAnimation);
       }
@@ -112,6 +134,7 @@ window.onload = function () {
   }
 
   function InnerScroll(container, elements, isDown) {
+    isScrolling = true;
     let containerTop = container.querySelector('.section__variants').getBoundingClientRect().top;
     let parent = container.querySelector('ul');
     let current = container.querySelector('.variant--current');
@@ -129,218 +152,155 @@ window.onload = function () {
     current.classList.remove('variant--current');
     Array.from(elements)[targetIndex].classList.add('variant--current');
     parent.style.transform = `translateY(${containerTop - target + pos}px)`;
+    setTimeout(() => isScrolling = false, 300);
   }
 
-  function SlidesScroll(elements, isDown) {
+  function SlidesScroll(container, elements, isDown) {
+    isScrolling = true;
     let current = Array.from(elements).findIndex(el => el.classList.contains('show'));
     let target = isDown ? current + 1 : current - 1;
     Array.from(elements)[current].classList.remove('show');
     Array.from(elements)[target].classList.add('show');
+    container.setAttribute('data-slide', +target);
+    setTimeout(() => isScrolling = false, 300);
   }
 
-  function ScrollToCenter(container, element, isDown) {
-    let start = null;
-    let firstPos = window.pageYOffset || document.documentElement.scrollTop;
-    let windowHeight = window.innerHeight;
-    let target = isDown ? (windowHeight + element.offsetHeight) / 2 : container.getBoundingClientRect().top;
-    let pos = 0;
-
-    console.log(firstPos, windowHeight, element.offsetHeight, element.getBoundingClientRect().top, target, pos);
-
-    element.classList.add('animate');
-
-    (function() {
-
-      const browser = ['ms', 'moz', 'webkit', 'o'];
-
-      for(let x = 0, length = browser.length; x < length && !window.requestAnimationFrame; x++) {
-        window.requestAnimationFrame = window[browser[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[browser[x]+'CancelAnimationFrame'] || window[browser[x]+'CancelRequestAnimationFrame'];
-      }
-
-    }());
-
-    function showAnimation (timestamp) {
-
-      if(!start) { start = timestamp || new Date().getTime(); } //get id of animation
-
-      let elapsed = timestamp - start;
-      let progress = elapsed / 900; // animation duration 600ms
-      progress = +progress.toFixed(2);
-
-      //ease in function from https://github.com/component/ease/blob/master/index.js
-      const outQuad = function(n){
-        return n * (2 - n);
-      };
-
-      let easeInPercentage = +(outQuad(progress)).toFixed(2);
-
-      pos = firstPos + (target * easeInPercentage);
-      pos = +pos.toFixed(2);
-      window.scrollTo(0, pos);
-
-      console.log(firstPos, target, pos, easeInPercentage, document.body.clientHeight - window.innerHeight);
-
-      if( pos < 0 ||
-        !isDown && pos <= 0 ||
-        !isDown && pos <= (firstPos + target + 1) ||
-        isDown && pos >= (firstPos + target) ||
-        isDown && pos >= document.body.clientHeight - window.innerHeight - 1 ||
-        pos > document.body.clientHeight - window.innerHeight ) {
-        cancelAnimationFrame(start);
-        if(element) {
-          element.focus();
-        }
-        pos = 0;
-      } else {
-        window.requestAnimationFrame(showAnimation);
-      }
+  function AnimateFade(current, target, idDown, time) {
+    if (!(!idDown && target.offsetHeight < window.innerHeight)) {
+      current.classList.add('animate-fade');
+      target.classList.remove('animate-fade');
     }
-    window.requestAnimationFrame(showAnimation);
-  }
-
-  function ScrollToBottom(container, element, isDown) {
-    let start = null;
-    let firstPos = window.pageYOffset || document.documentElement.scrollTop;
-    let windowHeight = window.innerHeight;
-    let target = isDown ? (container.offsetHeight - windowHeight) : element.getBoundingClientRect().bottom - windowHeight;
-    let pos = 0;
-
-    console.log(firstPos, element.offsetHeight, element.getBoundingClientRect().bottom, target, pos);
-
-    element.classList.add('animate');
-
-    (function() {
-
-      const browser = ['ms', 'moz', 'webkit', 'o'];
-
-      for(let x = 0, length = browser.length; x < length && !window.requestAnimationFrame; x++) {
-        window.requestAnimationFrame = window[browser[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[browser[x]+'CancelAnimationFrame'] || window[browser[x]+'CancelRequestAnimationFrame'];
-      }
-
-    }());
-
-    function showAnimation (timestamp) {
-
-      if(!start) { start = timestamp || new Date().getTime(); } //get id of animation
-
-      let elapsed = timestamp - start;
-      let progress = elapsed / 900; // animation duration 600ms
-      progress = +progress.toFixed(2);
-
-      //ease in function from https://github.com/component/ease/blob/master/index.js
-      const outQuad = function(n){
-        return n * (2 - n);
-      };
-
-      let easeInPercentage = +(outQuad(progress)).toFixed(2);
-
-      pos = firstPos + (target * easeInPercentage);
-      pos = +pos.toFixed(2);
-      window.scrollTo(0, pos);
-
-      console.log(firstPos, target, pos, easeInPercentage, document.body.clientHeight - window.innerHeight);
-
-      if( pos < 0 ||
-        !isDown && pos <= 0 ||
-        !isDown && pos <= (firstPos + target + 1) ||
-        isDown && pos >= (firstPos + target) ||
-        isDown && pos >= document.body.clientHeight - window.innerHeight - 1 ||
-        pos > document.body.clientHeight - window.innerHeight ) {
-        cancelAnimationFrame(start);
-        if(element) {
-          element.focus();
-        }
-        pos = 0;
-      } else {
-        window.requestAnimationFrame(showAnimation);
-      }
-    }
-    window.requestAnimationFrame(showAnimation);
   }
 
   function Wheel(e) {
     e.preventDefault();
-    let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
-    let target;
-    if (e.deltaY > 0) {
-      target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
-    } else {
-      target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
-    }
+    let isDown = e.deltaY > 0;
+    if (!isScrolling) {
+      let current = Array.from(sections).findIndex(section => section.classList.contains('animate'));
+      let target;
+      if (isDown) {
+        target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
+      } else {
+        target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
+      }
 
-    if (sections[current].classList.contains('section--variants')) {
-      let variants = document.querySelectorAll('.section--variants .variant');
-      if (e.deltaY > 0 && variants[variants.length - 1].classList.contains('variant--current') ||
-        e.deltaY < 0 && variants[0].classList.contains('variant--current')) {
-        new Scroll(target, e.deltaY > 0);
+      console.log(sections[current], target);
+
+      if (sections[current].classList.contains('section--variants')) {
+        let variants = document.querySelectorAll('.section--variants .variant');
+        if (isDown && variants[variants.length - 1].classList.contains('variant--current') ||
+          !isDown && variants[0].classList.contains('variant--current')) {
+          new AnimateFade(sections[current], target, isDown, 600);
+          new Scroll(target, isDown, 600);
+        } else {
+          new InnerScroll(document.querySelector('.section--variants'), variants, isDown);
+        }
+
+      } else if (sections[current].classList.contains('section--world')) {
+        let slides = document.querySelectorAll('.section--world .section__slide');
+        if (isDown && slides[slides.length - 1].classList.contains('show') ||
+          !isDown && slides[0].classList.contains('show')) {
+          new AnimateFade(sections[current], target, isDown, 600);
+          new Scroll(target, isDown, 600);
+        } else {
+          new SlidesScroll(sections[current], slides, isDown);
+        }
+
+      } else if (
+        sections[current].classList.contains('section--backstory') && isDown ||
+        target.classList.contains('section--backstory') && !isDown ||
+        target.classList.contains('section--world') && !isDown ||
+        document.querySelector('.place').classList.contains('animate')
+      ) {
+        let place = document.querySelector('.section--backstory .place');
+        if (place.classList.contains('animate')) {
+          if (isDown) {
+            place.classList.remove('animate');
+            new AnimateFade(sections[current].querySelector('.section__content'), place, isDown, 900);
+            new Scroll(place, isDown, 900, 'center');
+          } else {
+            sections[current].classList.remove('animate');
+            new Scroll(target, isDown, 600);
+          }
+        } else if (place.classList.contains('animate-fade')) {
+          place.classList.remove('animate-fade');
+          target.querySelector('.section__content').classList.add('animate-fade');
+          new Scroll(place, isDown, 900, 'center');
+        } else {
+          if (isDown) {
+            new Scroll(place, isDown, 900, 'center');
+            place.classList.add('animate-fade');
+          } else {
+            new Scroll(sections[current], isDown, 600);
+            place.classList.add('animate');
+            sections[current].querySelector('.section__content').classList.remove('animate-fade');
+          }
+        }
+
+      } else if (
+        sections[current].classList.contains('section--opportunities') && isDown ||
+        target.classList.contains('section--backstory') && !isDown ||
+        target.classList.contains('section--opportunities') && !isDown ||
+        document.querySelector('.community').classList.contains('animate')
+      ) {
+        let community = document.querySelector('.section--opportunities .community');
+        if (community.classList.contains('animate')) {
+          if (isDown) {
+            community.classList.remove('animate');
+            new AnimateFade(sections[current].querySelector('.section__content'), community, isDown, 900);
+            new Scroll(community, isDown, 900, 'center');
+          } else {
+            sections[current].classList.remove('animate');
+            new Scroll(target, isDown, 600);
+          }
+        } else if (community.classList.contains('animate-fade')) {
+          community.classList.remove('animate-fade');
+          target.querySelector('.section__content').classList.add('animate-fade');
+          new Scroll(community, isDown, 900, 'center');
+        } else {
+          if (isDown) {
+            new Scroll(community, isDown, 900, 'center');
+            community.classList.add('animate-fade');
+          } else {
+            new Scroll(sections[current], isDown, 600);
+            community.classList.add('animate');
+            sections[current].querySelector('.section__content').classList.remove('animate-fade');
+          }
+        }
+
+      } else if (
+        sections[current].classList.contains('section--roadmap') && isDown ||
+        target.classList.contains('section--opportunities') && !isDown ||
+        target.classList.contains('section--roadmap') && !isDown ||
+        document.querySelector('.expertise').classList.contains('animate')
+      ) {
+        let expertise = document.querySelector('.section--roadmap .expertise');
+        if (expertise.classList.contains('animate')) {
+          if (isDown) {
+            new AnimateFade(sections[current].querySelector('.section__content'), expertise, isDown, 900);
+            new Scroll(expertise, isDown, 900, 'bottom');
+            expertise.classList.remove('animate');
+          } else {
+            sections[current].classList.remove('animate');
+            new Scroll(target, isDown, 600);
+          }
+        } else if (expertise.classList.contains('animate-fade')) {
+          expertise.classList.remove('animate-fade');
+          target.querySelector('.section__content').classList.add('animate-fade');
+          new Scroll(expertise, isDown, 900, 'bottom');
+        } else {
+          if (isDown) {
+            new Scroll(target, isDown, 900, 'bottom');
+            expertise.classList.add('animate-fade');
+          } else {
+            new Scroll(expertise, isDown, 600);
+            expertise.classList.add('animate');
+            sections[current].querySelector('.section__content').classList.remove('animate-fade');
+          }
+        }
       } else {
-        new InnerScroll(document.querySelector('.section--variants'), variants, e.deltaY > 0);
+        new Scroll(target, isDown, 600);
       }
-    }
-    else if (sections[current].classList.contains('section--world')) {
-      let slides = document.querySelectorAll('.section--world .section__slide');
-      if (e.deltaY > 0 && slides[slides.length - 1].classList.contains('show') ||
-        e.deltaY < 0 && slides[0].classList.contains('show')) {
-        new Scroll(target, e.deltaY > 0);
-      } else {
-        new SlidesScroll(slides, e.deltaY > 0);
-      }
-    }
-    else if (
-      sections[current].classList.contains('section--backstory') && e.deltaY > 0 ||
-      target.classList.contains('section--backstory') && e.deltaY < 0 ||
-      document.querySelector('.animate').classList.contains('place')
-    ) {
-      let place = document.querySelector('.section--backstory .place');
-      if (sections[current].classList.contains('section--backstory')) {
-        new ScrollToCenter(document.querySelector('.section--backstory'), place, e.deltaY > 0);
-      } else {
-        let targetIndex = e.deltaY > 0 ?
-          Array.from(sections).findIndex(el => el.classList.contains('section--opportunities')) :
-          Array.from(sections).findIndex(el => el.classList.contains('section--backstory'));
-        target = Array.from(sections)[targetIndex];
-        new Scroll(target, e.deltaY > 0);
-        place.classList.remove('animate');
-      }
-    }
-    else if (
-      sections[current].classList.contains('section--opportunities') && e.deltaY > 0 ||
-      target.classList.contains('section--opportunities') && e.deltaY < 0 ||
-      document.querySelector('.animate').classList.contains('community')
-    ) {
-      let community = document.querySelector('.section--opportunities .community');
-      if (sections[current].classList.contains('section--opportunities')) {
-        new ScrollToCenter(document.querySelector('.section--opportunities'), community, e.deltaY > 0);
-      } else {
-        let targetIndex = e.deltaY > 0 ?
-          Array.from(sections).findIndex(el => el.classList.contains('section--roadmap')) :
-          Array.from(sections).findIndex(el => el.classList.contains('section--opportunities'));
-        target = Array.from(sections)[targetIndex];
-        new Scroll(target, e.deltaY > 0);
-        community.classList.remove('animate');
-      }
-    }
-    else if (
-      sections[current].classList.contains('section--roadmap') && e.deltaY > 0 ||
-      target.classList.contains('section--roadmap') && e.deltaY < 0 ||
-      document.querySelector('.animate').classList.contains('expertise')
-    ) {
-      let expertise = document.querySelector('.section--roadmap .expertise');
-      if (sections[current].classList.contains('section--roadmap')) {
-        new ScrollToBottom(document.querySelector('.section--roadmap'), expertise, e.deltaY > 0);
-      } else {
-        let targetIndex = e.deltaY > 0 ?
-          Array.from(sections).findIndex(el => el.classList.contains('section--partners')) :
-          Array.from(sections).findIndex(el => el.classList.contains('section--roadmap'));
-        target = Array.from(sections)[targetIndex];
-        new Scroll(target, e.deltaY > 0);
-        expertise.classList.remove('animate');
-      }
-    }
-    else {
-      new Scroll(target, e.deltaY > 0);
     }
   }
 
@@ -348,18 +308,25 @@ window.onload = function () {
   window.addEventListener('mousewheel', Wheel, {passive: false});
   window.addEventListener('DOMMouseScroll', Wheel, {passive: false});
 
-  document.onkeyup = function(e){
-    console.log('Key : ' + e.code);
-    let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
-    let target;
-    if (e.code === ('Space' || 'ArrowDown' || 'PageDown' || 'Down')) {
-      target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
-      new Scroll(target, true);
-    } else if (e.code === ('ArrowUp' || 'PageUp' || 'Up')) {
-      target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
-      new Scroll(target, false);
-    }
-  };
+  let iframes = document.querySelectorAll('iframe');
+  iframes.forEach((iframe) => {
+    iframe.addEventListener('wheel', Wheel, {passive: false});
+    iframe.addEventListener('mousewheel', Wheel, {passive: false});
+    iframe.addEventListener('DOMMouseScroll', Wheel, {passive: false});
+  });
+
+  // document.onkeyup = function(e){
+  //   console.log('Key : ' + e.code);
+  //   let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
+  //   let target;
+  //   if (e.code === ('Space' || 'ArrowDown' || 'PageDown' || 'Down')) {
+  //     target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
+  //     new Scroll(target, true);
+  //   } else if (e.code === ('ArrowUp' || 'PageUp' || 'Up')) {
+  //     target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
+  //     new Scroll(target, false);
+  //   }
+  // };
 
   let splide = new Splide( '.splide', {
     perPage: 3,
@@ -374,6 +341,6 @@ window.onload = function () {
       },
     },
   } );
-
   splide.mount();
 };
+
