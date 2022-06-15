@@ -509,8 +509,11 @@ img, picture {
     .section--roadmap .section__content {
       height: 50vh; }
       .section--roadmap .section__content.expertise {
-        height: calc(75vh - 132px);
-        margin-top: auto; }
+        height: calc(75vh + 64px);
+        margin-top: auto;
+        position: absolute;
+        bottom: 0;
+        padding-top: 0; }
   .section--partners {
     height: auto;
     padding-top: 112px;
@@ -1176,6 +1179,9 @@ img, picture {
     transform-origin: center;
     transform: none;
     transition: ease-in-out .6s .2s, opacity .6s .4s; }
+    @media screen and (max-width: 1500px) {
+      .section .place, .section .community, .section .expertise {
+        padding: 0 4.25vw; } }
     .section .place .section__title, .section .place .section__description, .section .community .section__title, .section .community .section__description, .section .expertise .section__title, .section .expertise .section__description {
       opacity: 1;
       transform: none; }
@@ -1356,7 +1362,8 @@ img, picture {
     .section .road .splide__pagination {
       display: none; }
   .section .expertise {
-    padding-bottom: 0; }
+    padding-bottom: 0;
+    transition-delay: .6s, .8s; }
     .section .expertise__lines {
       position: absolute;
       top: calc(50% - 128px);
@@ -1370,7 +1377,7 @@ img, picture {
         position: absolute;
         top: 0;
         bottom: 0;
-        transition: ease-in-out .75s .3s;
+        transition: ease-in-out .75s .6s;
         overflow: hidden; }
         .section .expertise__lines-inner:first-of-type {
           left: 0;
@@ -1405,7 +1412,7 @@ img, picture {
       transform-origin: center;
       transform: scale(1);
       opacity: 1;
-      transition: ease-in-out .6s .5s; }
+      transition: ease-in-out .6s .8s; }
       .section .expertise__logo--small {
         width: 9.5vw;
         min-width: 9.5vw;
@@ -1435,14 +1442,16 @@ img, picture {
       .section .expertise__logo:nth-of-type(6) {
         position: absolute;
         top: 13px;
-        right: -128px; }
-    .section .expertise.animate-off .expertise__lines-inner, .section .expertise.animate-fade .expertise__lines-inner {
-      width: 0%;
-      transition-delay: 0; }
-    .section .expertise.animate-off .expertise__logo, .section .expertise.animate-fade .expertise__logo {
-      transform: scale(0);
-      opacity: 0;
-      transition-delay: 0; }
+        right: 7.4vw; }
+    .section .expertise.animate-off, .section .expertise.animate-fade {
+      transition-delay: 0s; }
+      .section .expertise.animate-off .expertise__lines-inner, .section .expertise.animate-fade .expertise__lines-inner {
+        width: 0;
+        transition-delay: 0s; }
+      .section .expertise.animate-off .expertise__logo, .section .expertise.animate-fade .expertise__logo {
+        transform: scale(0);
+        opacity: 0;
+        transition-delay: 0s; }
 
 .footer {
   height: auto;

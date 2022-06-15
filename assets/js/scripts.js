@@ -222,7 +222,7 @@ window.onload = function () {
           new Scroll(expertise, isDown, 900, 'bottom');
         } else {
           if (isDown) {
-            new Scroll(target, isDown, 900, 'bottom');
+            new Scroll(target, isDown, 600);
             expertise.classList.add('animate-fade');
           } else {
             new Scroll(sections[current], isDown, 600);
