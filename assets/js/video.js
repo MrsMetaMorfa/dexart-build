@@ -33,7 +33,7 @@ function onYouTubeIframeAPIReady() {
     }
   });
 
-  console.log(player, player.hasOwnProperty('getPlayerState'));
+  // console.log(player, player.hasOwnProperty('getPlayerState'));
 }
 
 video.addEventListener('click', () => {

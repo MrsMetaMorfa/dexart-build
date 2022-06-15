@@ -65,20 +65,15 @@ window.onload = function () {
     let target = 0;
     let pos = 0;
 
-    switch (type) {
-      case 'center':
-        target = isDown ? (windowHeight + element.offsetHeight) / 2 : element.parentElement.getBoundingClientRect().top + (windowHeight + element.offsetHeight) / 2;
-        break;
-      case 'bottom':
-        target = element.parentElement.getBoundingClientRect().bottom - windowHeight;
-        element.classList.add('animate');
-        break;
-      default:
-        target = element.getBoundingClientRect().top;
-        break;
+    if (type === 'center') {
+      target = isDown ? (windowHeight + element.offsetHeight) / 2 : element.parentElement.getBoundingClientRect().top + (windowHeight + element.offsetHeight) / 2;
+    } else if (type === 'bottom') {
+      target = element.parentElement.getBoundingClientRect().bottom - windowHeight;
+    } else {
+      target = element.getBoundingClientRect().top;
     }
 
-    // console.log(firstPos, target, pos);
+    console.log(firstPos, target, pos, element);
 
     (function() {
 
@@ -188,9 +183,10 @@ window.onload = function () {
 
       if (sections[current].classList.contains('section--variants')) {
         let variants = document.querySelectorAll('.section--variants .variant');
-        if (isDown && variants[variants.length - 1].classList.contains('variant--current') ||
-          !isDown && variants[0].classList.contains('variant--current')) {
-          new AnimateFade(sections[current], target, isDown, 600);
+        if (
+          isDown && variants[variants.length - 1].classList.contains('variant--current') ||
+          !isDown && variants[0].classList.contains('variant--current')
+        ) {
           new Scroll(target, isDown, 600);
         } else {
           new InnerScroll(document.querySelector('.section--variants'), variants, isDown);
@@ -200,26 +196,84 @@ window.onload = function () {
         let slides = document.querySelectorAll('.section--world .section__slide');
         if (isDown && slides[slides.length - 1].classList.contains('show') ||
           !isDown && slides[0].classList.contains('show')) {
-          new AnimateFade(sections[current], target, isDown, 600);
           new Scroll(target, isDown, 600);
         } else {
           new SlidesScroll(sections[current], slides, isDown);
         }
 
       } else if (
-        sections[current].classList.contains('section--backstory') && isDown ||
+        sections[current].classList.contains('section--roadmap') ||
+        target.classList.contains('section--roadmap') && !isDown ||
+        target.classList.contains('section--opportunities') && !isDown
+      ) {
+        let expertise = document.querySelector('.section--roadmap .expertise');
+        if (expertise.classList.contains('animate-off')) {
+          if (isDown) {
+            new AnimateFade(sections[current].querySelector('.section__content'), expertise, isDown, 900);
+            new Scroll(expertise, isDown, 900, 'bottom');
+            expertise.classList.remove('animate-off');
+          } else {
+            target.querySelector('.community').classList.remove('animate-fade');
+            new Scroll(target.querySelector('.community'), isDown, 900, 'center');
+          }
+        } else if (expertise.classList.contains('animate-fade')) {
+          expertise.classList.remove('animate-fade');
+          target.querySelector('.section__content').classList.add('animate-fade');
+          new Scroll(expertise, isDown, 900, 'bottom');
+        } else {
+          if (isDown) {
+            new Scroll(target, isDown, 900, 'bottom');
+            expertise.classList.add('animate-fade');
+          } else {
+            new Scroll(sections[current], isDown, 600);
+            expertise.classList.add('animate-off');
+            sections[current].querySelector('.section__content').classList.remove('animate-fade');
+          }
+        }
+
+      } else if (
+        sections[current].classList.contains('section--opportunities') ||
+        target.classList.contains('section--opportunities') && !isDown ||
+        target.classList.contains('section--backstory') && !isDown
+      ) {
+        let community = document.querySelector('.section--opportunities .community');
+        if (community.classList.contains('animate-off')) {
+          if (isDown) {
+            community.classList.remove('animate-off');
+            new AnimateFade(sections[current].querySelector('.section__content'), community, isDown, 900);
+            new Scroll(community, isDown, 900, 'center');
+          } else {
+            target.querySelector('.place').classList.remove('animate-fade');
+            new Scroll(target.querySelector('.place'), isDown, 900, 'center');
+          }
+        } else if (community.classList.contains('animate-fade')) {
+          community.classList.remove('animate-fade');
+          target.querySelector('.section__content').classList.add('animate-fade');
+          new Scroll(community, isDown, 900, 'center');
+        } else {
+          if (isDown) {
+            new Scroll(community, isDown, 900, 'center');
+            community.classList.add('animate-fade');
+          } else {
+            new Scroll(sections[current], isDown, 600);
+            community.classList.add('animate-off');
+            sections[current].querySelector('.section__content').classList.remove('animate-fade');
+          }
+        }
+
+      } else if (
+        sections[current].classList.contains('section--backstory') ||
         target.classList.contains('section--backstory') && !isDown ||
-        target.classList.contains('section--world') && !isDown ||
-        document.querySelector('.place').classList.contains('animate')
+        target.classList.contains('section--world') && !isDown
       ) {
         let place = document.querySelector('.section--backstory .place');
-        if (place.classList.contains('animate')) {
+        if (place.classList.contains('animate-off')) {
           if (isDown) {
-            place.classList.remove('animate');
+            place.classList.remove('animate-off');
             new AnimateFade(sections[current].querySelector('.section__content'), place, isDown, 900);
             new Scroll(place, isDown, 900, 'center');
           } else {
-            sections[current].classList.remove('animate');
+            sections[current].classList.remove('animate-off');
             new Scroll(target, isDown, 600);
           }
         } else if (place.classList.contains('animate-fade')) {
@@ -232,72 +286,11 @@ window.onload = function () {
             place.classList.add('animate-fade');
           } else {
             new Scroll(sections[current], isDown, 600);
-            place.classList.add('animate');
+            place.classList.add('animate-off');
             sections[current].querySelector('.section__content').classList.remove('animate-fade');
           }
         }
 
-      } else if (
-        sections[current].classList.contains('section--opportunities') && isDown ||
-        target.classList.contains('section--backstory') && !isDown ||
-        target.classList.contains('section--opportunities') && !isDown ||
-        document.querySelector('.community').classList.contains('animate')
-      ) {
-        let community = document.querySelector('.section--opportunities .community');
-        if (community.classList.contains('animate')) {
-          if (isDown) {
-            community.classList.remove('animate');
-            new AnimateFade(sections[current].querySelector('.section__content'), community, isDown, 900);
-            new Scroll(community, isDown, 900, 'center');
-          } else {
-            sections[current].classList.remove('animate');
-            new Scroll(target, isDown, 600);
-          }
-        } else if (community.classList.contains('animate-fade')) {
-          community.classList.remove('animate-fade');
-          target.querySelector('.section__content').classList.add('animate-fade');
-          new Scroll(community, isDown, 900, 'center');
-        } else {
-          if (isDown) {
-            new Scroll(community, isDown, 900, 'center');
-            community.classList.add('animate-fade');
-          } else {
-            new Scroll(sections[current], isDown, 600);
-            community.classList.add('animate');
-            sections[current].querySelector('.section__content').classList.remove('animate-fade');
-          }
-        }
-
-      } else if (
-        sections[current].classList.contains('section--roadmap') && isDown ||
-        target.classList.contains('section--opportunities') && !isDown ||
-        target.classList.contains('section--roadmap') && !isDown ||
-        document.querySelector('.expertise').classList.contains('animate')
-      ) {
-        let expertise = document.querySelector('.section--roadmap .expertise');
-        if (expertise.classList.contains('animate')) {
-          if (isDown) {
-            new AnimateFade(sections[current].querySelector('.section__content'), expertise, isDown, 900);
-            new Scroll(expertise, isDown, 900, 'bottom');
-            expertise.classList.remove('animate');
-          } else {
-            sections[current].classList.remove('animate');
-            new Scroll(target, isDown, 600);
-          }
-        } else if (expertise.classList.contains('animate-fade')) {
-          expertise.classList.remove('animate-fade');
-          target.querySelector('.section__content').classList.add('animate-fade');
-          new Scroll(expertise, isDown, 900, 'bottom');
-        } else {
-          if (isDown) {
-            new Scroll(target, isDown, 900, 'bottom');
-            expertise.classList.add('animate-fade');
-          } else {
-            new Scroll(expertise, isDown, 600);
-            expertise.classList.add('animate');
-            sections[current].querySelector('.section__content').classList.remove('animate-fade');
-          }
-        }
       } else {
         new Scroll(target, isDown, 600);
       }
