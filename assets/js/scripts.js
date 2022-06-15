@@ -167,9 +167,9 @@ window.onload = function () {
     }
   }
 
-  function Wheel(e) {
+  function Wheel(e, down) {
     e.preventDefault();
-    let isDown = e.deltaY > 0;
+    let isDown = down || e.deltaY > 0;
     if (!isScrolling) {
       let current = Array.from(sections).findIndex(section => section.classList.contains('animate'));
       let target;
@@ -301,11 +301,20 @@ window.onload = function () {
   window.addEventListener('mousewheel', Wheel, {passive: false});
   window.addEventListener('DOMMouseScroll', Wheel, {passive: false});
 
-  let iframes = document.querySelectorAll('iframe');
-  iframes.forEach((iframe) => {
-    iframe.addEventListener('wheel', Wheel, {passive: false});
-    iframe.addEventListener('mousewheel', Wheel, {passive: false});
-    iframe.addEventListener('DOMMouseScroll', Wheel, {passive: false});
+  let touchStartPosY = 0;
+  document.body.ontouchstart = function(e){
+    touchStartPosY = e.changedTouches[0].clientY;
+  };
+  window.addEventListener('touchmove', (e) => {
+    // Different devices give different values with different decimal percentages.
+    const currentPageY = Math.round(e.changedTouches[0].screenY);
+    if (touchStartPosY === currentPageY) return;
+
+    if (touchStartPosY - currentPageY > 0) {
+      new Wheel(e, true);
+    } else {
+      new Wheel(e, false);
+    }
   });
 
   // document.onkeyup = function(e){
