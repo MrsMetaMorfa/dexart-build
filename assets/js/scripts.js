@@ -9,7 +9,7 @@
 window.onload = function () {
   const observerOptions = {
     root: null,
-    rootMargin: "24px",
+    rootMargin: '10%',
     threshold: 0.5
   };
 
@@ -58,6 +58,7 @@ window.onload = function () {
   let isScrolling = false;
 
   function Scroll(element, isDown, speed, type) {
+    console.log(element, isDown);
     isScrolling = true;
     let start = null;
     let firstPos = window.pageYOffset || document.documentElement.scrollTop;
@@ -73,7 +74,7 @@ window.onload = function () {
       target = element.getBoundingClientRect().top;
     }
 
-    console.log(firstPos, target, pos, element);
+    // console.log(firstPos, target, pos, element);
 
     (function() {
 
@@ -107,20 +108,29 @@ window.onload = function () {
       pos = +pos.toFixed(2);
       window.scrollTo(0, pos);
 
-      console.log(firstPos, target, pos, easeInPercentage);
+      console.log(
+        isNaN(pos), pos < 0,
+        !isDown && pos <= 0,
+        !isDown && pos <= (firstPos + target + 1),
+        isDown && pos >= (firstPos + target),
+        isDown && pos + windowHeight + windowHeight/6 > document.body.clientHeight,
+        isDown && element.getBoundingClientRect().bottom < document.body.clientHeight,
+        element.getBoundingClientRect().bottom, document.body.clientHeight
+        );
 
       if( isNaN(pos) || pos < 0 ||
         !isDown && pos <= 0 ||
         !isDown && pos <= (firstPos + target + 1) ||
         isDown && pos >= (firstPos + target) ||
-        isDown && pos >= document.body.clientHeight - window.innerHeight - 1 ||
-        pos > document.body.clientHeight - window.innerHeight ) {
+        isDown && element.getBoundingClientRect().bottom < document.body.clientHeight ){
         cancelAnimationFrame(start);
         if(element) {
           element.focus();
         }
-        pos = 0;
-        isScrolling = false;
+        setTimeout(()=> {
+          isScrolling = false;
+          console.log(pos, isScrolling, element);
+        }, 300);
       } else {
         window.requestAnimationFrame(showAnimation);
       }
@@ -167,14 +177,15 @@ window.onload = function () {
     }
   }
 
-  function Wheel(e, down) {
+  function Wheel(e, Down) {
     e.preventDefault();
-    let isDown = down || e.deltaY > 0;
     if (!isScrolling) {
       let current = Array.from(sections).findIndex(section => section.classList.contains('animate'));
+      let isDown = e.deltaY > 0 || sections[current].getBoundingClientRect().top < 0;
+      console.log(sections[current].getBoundingClientRect().top, isDown, Down);
       let target;
       if (isDown) {
-        target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
+        target = current + 1 <= sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
       } else {
         target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
       }
@@ -187,6 +198,8 @@ window.onload = function () {
         ) {
           new Scroll(target, isDown, 600);
         } else {
+          console.log(sections[current], sections[current].getBoundingClientRect().top);
+          sections[current].scrollTo({top: 0, left: 0, behavior: "instant"});
           new InnerScroll(document.querySelector('.section--variants'), variants, isDown);
         }
 
@@ -299,25 +312,8 @@ window.onload = function () {
   window.addEventListener('wheel', Wheel, {passive: false});
   window.addEventListener('mousewheel', Wheel, {passive: false});
   window.addEventListener('DOMMouseScroll', Wheel, {passive: false});
-
-  let touchStartPosY = 0;
-  document.body.ontouchstart = function(e){
-    touchStartPosY = e.changedTouches[0].clientY;
-    console.log(e.changedTouches);
-  };
-  window.addEventListener('touchmove', (e) => {
-    // Different devices give different values with different decimal percentages.
-    const currentPageY = Math.round(e.changedTouches[0].screenY);
-    console.log(currentPageY, touchStartPosY);
-    if (touchStartPosY - currentPageY > 50) {
-      e.preventDefault();
-      new Wheel(e, true);
-    } else if (touchStartPosY - currentPageY < -50) {
-      e.preventDefault();
-      new Wheel(e, false);
-    }
-  });
-
+  window.addEventListener('scroll', Wheel, {passive: false});
+  //
   // document.onkeyup = function(e){
   //   console.log('Key : ' + e.code);
   //   let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
