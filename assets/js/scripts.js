@@ -29,7 +29,7 @@ window.onload = function () {
 
   const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-  const fadeElms = document.querySelectorAll('section');
+  const fadeElms = document.querySelectorAll('.section');
   fadeElms.forEach(el => observer.observe(el));
 
   function Parallax(e) {
@@ -107,7 +107,7 @@ window.onload = function () {
       pos = +pos.toFixed(2);
       window.scrollTo(0, pos);
 
-      // console.log(firstPos, target, pos, easeInPercentage);
+      console.log(firstPos, target, pos, easeInPercentage);
 
       if( isNaN(pos) || pos < 0 ||
         !isDown && pos <= 0 ||
@@ -160,7 +160,7 @@ window.onload = function () {
     setTimeout(() => isScrolling = false, 300);
   }
 
-  function AnimateFade(current, target, idDown, time) {
+  function AnimateFade(current, target, idDown) {
     if (!(!idDown && target.offsetHeight < window.innerHeight)) {
       current.classList.add('animate-fade');
       target.classList.remove('animate-fade');
@@ -178,8 +178,6 @@ window.onload = function () {
       } else {
         target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
       }
-
-      console.log(sections[current], target);
 
       if (sections[current].classList.contains('section--variants')) {
         let variants = document.querySelectorAll('.section--variants .variant');
@@ -209,7 +207,7 @@ window.onload = function () {
         let expertise = document.querySelector('.section--roadmap .expertise');
         if (expertise.classList.contains('animate-off')) {
           if (isDown) {
-            new AnimateFade(sections[current].querySelector('.section__content'), expertise, isDown, 900);
+            new AnimateFade(sections[current].querySelector('.section__content'), expertise, isDown);
             new Scroll(expertise, isDown, 900, 'bottom');
             expertise.classList.remove('animate-off');
           } else {
@@ -240,7 +238,7 @@ window.onload = function () {
         if (community.classList.contains('animate-off')) {
           if (isDown) {
             community.classList.remove('animate-off');
-            new AnimateFade(sections[current].querySelector('.section__content'), community, isDown, 900);
+            new AnimateFade(sections[current].querySelector('.section__content'), community, isDown);
             new Scroll(community, isDown, 900, 'center');
           } else {
             target.querySelector('.place').classList.remove('animate-fade');
@@ -270,7 +268,7 @@ window.onload = function () {
         if (place.classList.contains('animate-off')) {
           if (isDown) {
             place.classList.remove('animate-off');
-            new AnimateFade(sections[current].querySelector('.section__content'), place, isDown, 900);
+            new AnimateFade(sections[current].querySelector('.section__content'), place, isDown);
             new Scroll(place, isDown, 900, 'center');
           } else {
             sections[current].classList.remove('animate-off');
@@ -292,6 +290,7 @@ window.onload = function () {
         }
 
       } else {
+        console.log(target);
         new Scroll(target, isDown, 600);
       }
     }
@@ -304,15 +303,17 @@ window.onload = function () {
   let touchStartPosY = 0;
   document.body.ontouchstart = function(e){
     touchStartPosY = e.changedTouches[0].clientY;
+    console.log(e.changedTouches);
   };
   window.addEventListener('touchmove', (e) => {
     // Different devices give different values with different decimal percentages.
     const currentPageY = Math.round(e.changedTouches[0].screenY);
-    if (touchStartPosY === currentPageY) return;
-
-    if (touchStartPosY - currentPageY > 0) {
+    console.log(currentPageY, touchStartPosY);
+    if (touchStartPosY - currentPageY > 50) {
+      e.preventDefault();
       new Wheel(e, true);
-    } else {
+    } else if (touchStartPosY - currentPageY < -50) {
+      e.preventDefault();
       new Wheel(e, false);
     }
   });
@@ -322,20 +323,21 @@ window.onload = function () {
   //   let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
   //   let target;
   //   if (e.code === ('Space' || 'ArrowDown' || 'PageDown' || 'Down')) {
+  //     e.preventDefault();
   //     target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
   //     new Scroll(target, true);
   //   } else if (e.code === ('ArrowUp' || 'PageUp' || 'Up')) {
+  //     e.preventDefault();
   //     target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
   //     new Scroll(target, false);
   //   }
   // };
 
-  let splide = new Splide( '.splide', {
+  let splide = new Splide( '.road', {
     perPage: 3,
     perMove: 1,
-    gap    : '32px',
     breakpoints: {
-      820: {
+      920: {
         perPage: 2
       },
       520: {
@@ -344,5 +346,37 @@ window.onload = function () {
     },
   } );
   splide.mount();
+
+  let press = new Splide( '.section__articles', {
+    perPage: 3,
+    perMove: 1,
+    gap: '32px',
+    breakpoints: {
+      640: {
+        gap: '16px',
+        perPage: 2
+      },
+      520: {
+        gap: '16px',
+        perPage: 1
+      },
+    },
+  } );
+  press.mount();
+
+  let splideOpp = new Splide( '.section__opportunities', {
+    perPage: 4,
+    perMove: 1,
+    gap: '32px',
+    breakpoints: {
+      920: {
+        perPage: 2
+      },
+      640: {
+        perPage: 1
+      }
+    },
+  } );
+  splideOpp.mount();
 };
 
