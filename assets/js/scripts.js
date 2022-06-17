@@ -7,6 +7,13 @@
  * Copyright 2022. License: MIT
  */
 window.onload = function () {
+  const sections = document.querySelectorAll('.section');
+  let variants = document.querySelectorAll('.section--variants .variant');
+
+  let isScrolling = false;
+  let lastScrollTop = 0;
+  let isDown = true;
+
   const observerOptions = {
     root: null,
     rootMargin: '10%',
@@ -29,33 +36,7 @@ window.onload = function () {
 
   const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-  const fadeElms = document.querySelectorAll('.section');
-  fadeElms.forEach(el => observer.observe(el));
-
-  function Parallax(e) {
-    let _w = window.innerWidth/2;
-    let _h = window.innerHeight/2;
-    let _mouseX = e.clientX;
-    let _mouseY = e.clientY;
-    let elems = this.querySelectorAll('.parallaxed');
-    elems.forEach((el, index) => {
-      let multiply = index * -0.001 - 0.001;
-      el.style.marginLeft = `${(_mouseX - _w) * multiply}%`;
-      el.style.marginTop = `${(_mouseY - _h) * multiply}%`;
-    });
-  }
-
-  const parallaxes = document.querySelectorAll('.parallax');
-  parallaxes.forEach((parallax) => {
-    parallax.addEventListener("mousemove", Parallax);
-  });
-
-  const sections = document.querySelectorAll('.section');
-
-  // sections.forEach((section) => {
-  //   console.log(section.classList);
-  // });
-  let isScrolling = false;
+  sections.forEach(el => observer.observe(el));
 
   function Scroll(element, isDown, speed, type) {
     console.log(element, isDown);
@@ -113,23 +94,25 @@ window.onload = function () {
         !isDown && pos <= 0,
         !isDown && pos <= (firstPos + target + 1),
         isDown && pos >= (firstPos + target),
-        isDown && pos + windowHeight + windowHeight/6 > document.body.clientHeight,
-        isDown && element.getBoundingClientRect().bottom < document.body.clientHeight,
-        element.getBoundingClientRect().bottom, document.body.clientHeight
+        isDown && document.body.getBoundingClientRect().bottom - 1 < windowHeight,
+        isDown && element.getBoundingClientRect().top.toFixed(0) - 1 >= 0,
+        element.getBoundingClientRect().top.toFixed(0) + 1
         );
 
       if( isNaN(pos) || pos < 0 ||
         !isDown && pos <= 0 ||
         !isDown && pos <= (firstPos + target + 1) ||
         isDown && pos >= (firstPos + target) ||
-        isDown && element.getBoundingClientRect().bottom < document.body.clientHeight ){
+        isDown && document.body.getBoundingClientRect().bottom - 1 < windowHeight ||
+        isDown && element.getBoundingClientRect().top.toFixed(0) - 1 <= 0
+      ){
         cancelAnimationFrame(start);
         if(element) {
           element.focus();
         }
         setTimeout(()=> {
           isScrolling = false;
-          console.log(pos, isScrolling, element);
+          // console.log(pos, isScrolling, element);
         }, 300);
       } else {
         window.requestAnimationFrame(showAnimation);
@@ -153,7 +136,7 @@ window.onload = function () {
       let matrix = new DOMMatrixReadOnly(style.transform);
       pos = matrix.m42;
     }
-    console.log(containerTop, parent.getBoundingClientRect().top, target, pos);
+    // console.log(containerTop, parent.getBoundingClientRect().top, target, pos);
     current.classList.remove('variant--current');
     Array.from(elements)[targetIndex].classList.add('variant--current');
     parent.style.transform = `translateY(${containerTop - target + pos}px)`;
@@ -181,25 +164,21 @@ window.onload = function () {
     e.preventDefault();
     if (!isScrolling) {
       let current = Array.from(sections).findIndex(section => section.classList.contains('animate'));
-      let isDown = e.deltaY > 0 || sections[current].getBoundingClientRect().top < 0;
-      console.log(sections[current].getBoundingClientRect().top, isDown, Down);
+      let isDown = Down || e.deltaY > 0;
       let target;
       if (isDown) {
-        target = current + 1 <= sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
+        target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
       } else {
         target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
       }
+      console.log(current, sections.length, sections[current].getBoundingClientRect().top, isDown, Down);
 
       if (sections[current].classList.contains('section--variants')) {
-        let variants = document.querySelectorAll('.section--variants .variant');
-        if (
-          isDown && variants[variants.length - 1].classList.contains('variant--current') ||
-          !isDown && variants[0].classList.contains('variant--current')
-        ) {
+        if (isDown && variants[variants.length - 1].classList.contains('variant--current') ||
+          !isDown && variants[0].classList.contains('variant--current')) {
           new Scroll(target, isDown, 600);
         } else {
-          console.log(sections[current], sections[current].getBoundingClientRect().top);
-          sections[current].scrollTo({top: 0, left: 0, behavior: "instant"});
+          sections[current].scrollIntoView({behavior: 'auto'});
           new InnerScroll(document.querySelector('.section--variants'), variants, isDown);
         }
 
@@ -209,6 +188,7 @@ window.onload = function () {
           !isDown && slides[0].classList.contains('show')) {
           new Scroll(target, isDown, 600);
         } else {
+          sections[current].scrollIntoView({behavior: 'auto'});
           new SlidesScroll(sections[current], slides, isDown);
         }
 
@@ -233,8 +213,8 @@ window.onload = function () {
           new Scroll(expertise, isDown, 900, 'bottom');
         } else {
           if (isDown) {
-            new Scroll(target, isDown, 600);
             expertise.classList.add('animate-fade');
+            new Scroll(target, isDown, 600);
           } else {
             new Scroll(sections[current], isDown, 600);
             expertise.classList.add('animate-off');
@@ -263,7 +243,7 @@ window.onload = function () {
           new Scroll(community, isDown, 900, 'center');
         } else {
           if (isDown) {
-            new Scroll(community, isDown, 900, 'center');
+            new Scroll(target, isDown, 600);
             community.classList.add('animate-fade');
           } else {
             new Scroll(sections[current], isDown, 600);
@@ -293,7 +273,7 @@ window.onload = function () {
           new Scroll(place, isDown, 900, 'center');
         } else {
           if (isDown) {
-            new Scroll(place, isDown, 900, 'center');
+            new Scroll(target, isDown, 600);
             place.classList.add('animate-fade');
           } else {
             new Scroll(sections[current], isDown, 600);
@@ -312,22 +292,36 @@ window.onload = function () {
   window.addEventListener('wheel', Wheel, {passive: false});
   window.addEventListener('mousewheel', Wheel, {passive: false});
   window.addEventListener('DOMMouseScroll', Wheel, {passive: false});
-  window.addEventListener('scroll', Wheel, {passive: false});
-  //
-  // document.onkeyup = function(e){
-  //   console.log('Key : ' + e.code);
-  //   let current = Array.from(sections).findIndex( section => section.classList.contains('animate') );
-  //   let target;
-  //   if (e.code === ('Space' || 'ArrowDown' || 'PageDown' || 'Down')) {
-  //     e.preventDefault();
-  //     target = current + 1 < sections.length ? Array.from(sections)[current + 1] : Array.from(sections)[current];
-  //     new Scroll(target, true);
-  //   } else if (e.code === ('ArrowUp' || 'PageUp' || 'Up')) {
-  //     e.preventDefault();
-  //     target = current > 0 ? Array.from(sections)[current - 1] : Array.from(sections)[0];
-  //     new Scroll(target, false);
-  //   }
-  // };
+
+
+  window.addEventListener('touchmove', (e)=>{
+
+  }, {passive: false});
+
+  window.addEventListener('scroll', (e)=>{
+    let st = document.body.getBoundingClientRect().top;
+    isDown = st - lastScrollTop < 0;
+    new Wheel(e, isDown);
+    lastScrollTop = st;
+  }, {passive: false});
+
+  function Parallax(e) {
+    let _w = window.innerWidth/2;
+    let _h = window.innerHeight/2;
+    let _mouseX = e.clientX;
+    let _mouseY = e.clientY;
+    let elems = this.querySelectorAll('.parallaxed');
+    elems.forEach((el, index) => {
+      let multiply = index * -0.001 - 0.001;
+      el.style.marginLeft = `${(_mouseX - _w) * multiply}%`;
+      el.style.marginTop = `${(_mouseY - _h) * multiply}%`;
+    });
+  }
+
+  const parallaxes = document.querySelectorAll('.parallax');
+  parallaxes.forEach((parallax) => {
+    parallax.addEventListener("mousemove", Parallax);
+  });
 
   let splide = new Splide( '.road', {
     perPage: 3,

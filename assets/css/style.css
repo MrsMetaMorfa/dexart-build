@@ -759,7 +759,10 @@ img, picture {
         .section__bg .magical__gradient {
           width: 120vw;
           left: -10vw;
-          transform: none; } }
+          transform: none; }
+          .section__bg .magical__gradient img {
+            -o-object-fit: cover;
+               object-fit: cover; } }
     .section__bg .magical__stone {
       width: auto;
       left: unset;
@@ -869,8 +872,8 @@ img, picture {
       -o-object-fit: contain;
          object-fit: contain; }
       .section__bg .variants__gradient img {
-        -o-object-fit: contain;
-           object-fit: contain; }
+        -o-object-fit: cover;
+           object-fit: cover; }
     .section__bg .world {
       background: linear-gradient(212.88deg, #0E031A 16.43%, #170932 78.02%); }
       .section__bg .world__gradient {
