@@ -95,7 +95,7 @@ window.onload = function () {
         !isDown && pos <= (firstPos + target + 1),
         isDown && pos >= (firstPos + target),
         isDown && document.body.getBoundingClientRect().bottom - 1 < windowHeight,
-        isDown && element.getBoundingClientRect().top.toFixed(0) - 1 >= 0,
+        isDown && (element.getBoundingClientRect().top.toFixed(0) - 1 >= 0 && element.innerHeight <= windowHeight),
         element.getBoundingClientRect().top.toFixed(0) + 1
         );
 
@@ -104,7 +104,7 @@ window.onload = function () {
         !isDown && pos <= (firstPos + target + 1) ||
         isDown && pos >= (firstPos + target) ||
         isDown && document.body.getBoundingClientRect().bottom - 1 < windowHeight ||
-        isDown && element.getBoundingClientRect().top.toFixed(0) - 1 <= 0
+        isDown && (element.getBoundingClientRect().top.toFixed(0) - 1 <= 0 && element.innerHeight <= windowHeight)
       ){
         cancelAnimationFrame(start);
         if(element) {
@@ -150,14 +150,16 @@ window.onload = function () {
     Array.from(elements)[current].classList.remove('show');
     Array.from(elements)[target].classList.add('show');
     container.setAttribute('data-slide', +target);
-    setTimeout(() => isScrolling = false, 300);
+    setTimeout(() => isScrolling = false, 400);
   }
 
   function AnimateFade(current, target, idDown) {
+    isScrolling = true;
     if (!(!idDown && target.offsetHeight < window.innerHeight)) {
       current.classList.add('animate-fade');
       target.classList.remove('animate-fade');
     }
+    setTimeout(() => isScrolling = false, 300);
   }
 
   function Wheel(e, Down) {
@@ -282,6 +284,13 @@ window.onload = function () {
           }
         }
 
+      } else if (sections[current].classList.contains('footer') && target.classList.contains('footer')){
+        console.log('footer');
+        if (isDown) {
+          new Scroll(target, isDown, 600, 'bottom');
+        } else {
+          new Scroll(target, isDown, 600);
+        }
       } else {
         console.log(target);
         new Scroll(target, isDown, 600);
@@ -293,17 +302,32 @@ window.onload = function () {
   window.addEventListener('mousewheel', Wheel, {passive: false});
   window.addEventListener('DOMMouseScroll', Wheel, {passive: false});
 
-
-  window.addEventListener('touchmove', (e)=>{
-
+  let touchY;
+  window.addEventListener('touchstart', (e) => {
+    touchY = e.touches[0].screenY;
+  }, {passive: false});
+  window.addEventListener('touchmove', (e) => {
+    let deltaY = touchY - e.touches[0].screenY;
+    console.log(deltaY);
+    if (deltaY >= 50) {
+      e.preventDefault();
+      new Wheel(e, deltaY > 0);
+    }
+    if (deltaY <= -50) {
+      e.preventDefault();
+      new Wheel(e, deltaY > 0);
+    }
+    else {
+      e.preventDefault();
+    }
   }, {passive: false});
 
-  window.addEventListener('scroll', (e)=>{
-    let st = document.body.getBoundingClientRect().top;
-    isDown = st - lastScrollTop < 0;
-    new Wheel(e, isDown);
-    lastScrollTop = st;
-  }, {passive: false});
+  // window.addEventListener('scroll', (e)=>{
+  //   let st = document.body.getBoundingClientRect().top;
+  //   isDown = st - lastScrollTop < 0;
+  //   new Wheel(e, isDown);
+  //   lastScrollTop = st;
+  // }, {passive: false});
 
   function Parallax(e) {
     let _w = window.innerWidth/2;
